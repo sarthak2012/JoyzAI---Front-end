@@ -1,41 +1,42 @@
-// render.js
-import { deleteTask as storageDeleteTask, getTasks } from './storage.js';
-import { attachDragHandlers } from './dragdrop.js';
+import { deleteTask as storageDeleteTask, getTasks } from "./storage.js";
+import { attachDragHandlers } from "./dragdrop.js";
 
 const priorityOrder = { High: 1, Medium: 2, Low: 3 };
 const rendered = new Map();
 const columns = {};
 
 export function initRender() {
-  columns.todo = document.getElementById('todo');
-  columns.inprogress = document.getElementById('inprogress');
-  columns.done = document.getElementById('done');
+  columns.todo = document.getElementById("todo");
+  columns.inprogress = document.getElementById("inprogress");
+  columns.done = document.getElementById("done");
 }
 
-function priorityValue(p) { return priorityOrder[p] ?? 99; }
+function priorityValue(p) {
+  return priorityOrder[p] ?? 99;
+}
 
 function createTaskElement(task) {
-  const div = document.createElement('div');
-  div.className = 'task';
+  const div = document.createElement("div");
+  div.className = "task";
   div.draggable = true;
   div.dataset.id = task.id;
   div.dataset.priority = task.priority;
 
-  const titleSpan = document.createElement('span');
-  titleSpan.className = 'task-title';
+  const titleSpan = document.createElement("span");
+  titleSpan.className = "task-title";
   titleSpan.textContent = task.title;
 
-  const priSpan = document.createElement('span');
-  priSpan.className = 'task-priority';
+  const priSpan = document.createElement("span");
+  priSpan.className = "task-priority";
   priSpan.textContent = task.priority;
 
-  const btn = document.createElement('button');
-  btn.className = 'task-delete';
-  btn.textContent = 'x';
-  btn.addEventListener('click', (e) => {
+  const btn = document.createElement("button");
+  btn.className = "task-delete";
+  btn.textContent = "x";
+  btn.addEventListener("click", (e) => {
     e.stopPropagation();
-    storageDeleteTask(task.id);        // deletes in storage (by unique id)
-    removeTaskElement(task.id);       // removes only the element
+    storageDeleteTask(task.id);
+    removeTaskElement(task.id);
   });
 
   div.appendChild(titleSpan);
@@ -50,12 +51,10 @@ function createTaskElement(task) {
 export function addOrUpdateTask(task) {
   const existing = rendered.get(task.id);
   if (existing) {
-    // update text/priority
-    existing.querySelector('.task-title').textContent = task.title;
-    existing.querySelector('.task-priority').textContent = task.priority;
+    existing.querySelector(".task-title").textContent = task.title;
+    existing.querySelector(".task-priority").textContent = task.priority;
     existing.dataset.priority = task.priority;
 
-    // move if status changed or reorder to respect priority
     if (existing.dataset.status !== task.status) {
       existing.dataset.status = task.status;
       insertTaskElementSorted(existing, columns[task.status]);
@@ -82,7 +81,7 @@ function insertTaskElementSorted(el, container) {
   let inserted = false;
   for (const child of children) {
     const childPr = priorityValue(child.dataset.priority);
-    if (newPr < childPr) { // lower numeric value = higher priority
+    if (newPr < childPr) {
       container.insertBefore(el, child);
       inserted = true;
       break;
@@ -92,9 +91,8 @@ function insertTaskElementSorted(el, container) {
 }
 
 export function renderAllFromStorage() {
-  // initial build: clear and create elements (this happens only once or on full restore)
-  Object.values(columns).forEach(col => col.innerHTML = '');
+  Object.values(columns).forEach((col) => (col.innerHTML = ""));
   rendered.clear();
   const tasks = getTasks();
-  tasks.forEach(t => addOrUpdateTask(t));
+  tasks.forEach((t) => addOrUpdateTask(t));
 }

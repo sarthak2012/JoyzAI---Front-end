@@ -1,0 +1,128 @@
+Part 1 – What the Project Is About
+
+You are given a basic Kanban Board app (like Trello, but very minimal).
+
+Currently, the app allows:
+
+Creating tasks → they appear in the To Do column.
+
+Dragging & dropping tasks between columns (To Do → In Progress → Done).
+
+Deleting tasks.
+
+Issues with the old version:
+
+Bug #1: Task IDs collide because they are generated with Date.now() only → if you add 2 tasks quickly, they get the same ID. This breaks drag-and-drop.
+
+Bug #2: Deleting sometimes removes the wrong task, because IDs are not unique.
+
+Bad structure: Everything is in one file (index.html script tag) → hard to maintain.
+
+New Feature Missing: Tasks don’t have priority (High/Medium/Low). Requirement:
+
+When creating a task, user must choose priority.
+
+Tasks inside each column should always be auto-sorted → High first, then Medium, then Low.
+
+Your Job:
+
+Refactor code into 3 JS modules:
+
+storage.js → Handles task data: create, delete, update, load, save.
+
+render.js → Handles DOM rendering (only what changes).
+
+dragdrop.js → Handles drag-and-drop events.
+
+Fix both bugs (ID collisions + delete issue).
+
+Add task priority feature with sorting.
+
+Write a README.md explaining your structure, DOM update logic, and one future feature.
+
+🔹 Part 2 – Code Structure (Modules Explanation)
+1. storage.js
+
+👉 Handles all data logic, keeps things independent of UI.
+
+Generates unique task IDs (crypto.randomUUID() instead of Date.now()).
+
+Creates a task with title, status, and priority.
+
+Saves to and loads from localStorage.
+
+Provides helper functions (getTasksByStatus, updateTaskStatus, etc.).
+
+2. render.js
+
+👉 Handles DOM rendering only.
+
+Clears & re-renders tasks in each column.
+
+Adds buttons, drag attributes, etc.
+
+Ensures tasks are sorted by priority inside each column (High > Medium > Low).
+
+Only updates changed parts, not the entire DOM.
+
+3. dragdrop.js
+
+👉 Handles all drag-and-drop behavior.
+
+Stores the dragged task ID during dragstart.
+
+On drop, finds the task and updates its status.
+
+Calls render() again to refresh UI.
+
+Fixes the bug where task ID was getting lost.
+
+4. main.js
+
+👉 Entry point.
+
+Handles form submission.
+
+Connects everything together.
+
+Imports from storage.js, render.js, dragdrop.js.
+
+🔹 Part 3 – Explaining in an Interview (Your Pitch)
+
+Imagine the interviewer asks:
+“Can you explain the project and your implementation choices?”
+
+You can say:
+
+Project Explanation (Simple):
+
+This project is a refactored Kanban board where users can add tasks, drag and drop them between columns, and delete them. I fixed two major bugs around task IDs and deletion, and I added a new feature where every task has a priority (High, Medium, Low). Tasks are automatically sorted by priority inside each column.
+
+Why Modules?
+
+I split the logic into three modules because it follows the principle of separation of concerns.
+
+storage.js focuses only on task data and localStorage.
+
+render.js only cares about updating the DOM.
+
+dragdrop.js is dedicated to drag-and-drop events.
+This makes the code easier to maintain, test, and extend with new features later.
+
+How I Fixed the Bugs:
+
+For the first bug, I replaced Date.now() IDs with crypto.randomUUID() to ensure uniqueness.
+For the second bug, I made sure tasks are always filtered/deleted by these unique IDs, so the wrong task can’t be removed.
+
+How I Handled DOM Updates:
+
+Instead of reloading the whole page or re-rendering unnecessarily, I clear only the contents of each column and re-render the tasks from the updated data. This way, only the changed parts of the DOM update, making it more efficient and avoiding flickering.
+
+Priority Feature:
+
+When creating a task, the user selects a priority (High, Medium, Low). I store this with the task object. When rendering tasks in a column, I sort them by priority so that High comes first, then Medium, then Low. This improves usability and helps users focus on the most important tasks.
+
+Future Feature (README Question):
+
+One feature I’d like to add next is due dates. Tasks could have a deadline, and the board could highlight overdue tasks in red. I would add a dueDate property in storage.js, render it in render.js, and update rendering logic to visually mark overdue tasks.
+
